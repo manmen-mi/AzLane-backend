@@ -30,6 +30,7 @@ router.get("/main/:chapter/:stage", async (ctx) => {
     }
 
     ctx.response.body = JSON.stringify(source[chapter - 1][stage].normal);
+    ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   })
   .get("/event/:key/:stage", async (ctx) => {
     const params = helpers.getQuery(ctx, { mergeParams: true });
@@ -44,6 +45,7 @@ router.get("/main/:chapter/:stage", async (ctx) => {
     }
 
     ctx.response.body = JSON.stringify(source[stage].normal);
+    ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   });
 
 app.use(router.routes());
