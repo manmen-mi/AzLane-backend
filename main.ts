@@ -17,20 +17,39 @@ app.use(async (ctx, next) => {
   ctx.response.headers.set("X-Response-Time", `${ms}ms`);
 });
 
+// CORS header
+app.use((ctx, next) => {
+  next();
+  ctx.response.headers.append('Access-Control-Allow-Origin', '*');
+});
+
+const getSource = async (filename: string) => {
+  const file = await Deno.readTextFile(`./${filename}.json`);
+  return JSON.parse(file);
+}
+
 const router = new Router();
 router.get("/main/:chapter/:stage", async (ctx) => {
     const params = helpers.getQuery(ctx, { mergeParams: true });
-    const file = await Deno.readTextFile('./chapters.json');
-    const source = JSON.parse(file);
-
     const chapter = +params.chapter;
     const stage = +params.stage;
     if (!chapter || !stage) {
       ctx.throw(404);
     }
 
+    const source = await getSource('chapters');
     ctx.response.body = JSON.stringify(source[chapter - 1][stage].normal);
-    ctx.response.headers.append('Access-Control-Allow-Origin', '*');
+  })
+  .get("/hard/:chapter/:stage", async (ctx) => {
+    const params = helpers.getQuery(ctx, { mergeParams: true });
+    const chapter = +params.chapter;
+    const stage = +params.stage;
+    if (!chapter || !stage) {
+      ctx.throw(404);
+    }
+
+    const source = await getSource('chapters');
+    ctx.response.body = JSON.stringify(source[chapter - 1][stage].hard);
   })
   .get("/event/:key/:stage", async (ctx) => {
     const params = helpers.getQuery(ctx, { mergeParams: true });
@@ -45,7 +64,6 @@ router.get("/main/:chapter/:stage", async (ctx) => {
     }
 
     ctx.response.body = JSON.stringify(source[stage].normal);
-    ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   });
 
 app.use(router.routes());
