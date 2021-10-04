@@ -32,19 +32,7 @@ router.get("/main/:chapter/:stage", async (ctx) => {
     }
 
     const source = await getSource('chapters');
-    ctx.response.body = JSON.stringify(source[chapter - 1][stage].normal);
-    ctx.response.headers.append('Access-Control-Allow-Origin', '*');
-  })
-  .get("/hard/:chapter/:stage", async (ctx) => {
-    const params = helpers.getQuery(ctx, { mergeParams: true });
-    const chapter = +params.chapter;
-    const stage = +params.stage;
-    if (!chapter || !stage) {
-      ctx.throw(404);
-    }
-
-    const source = await getSource('chapters');
-    ctx.response.body = JSON.stringify(source[chapter - 1][stage].hard);
+    ctx.response.body = JSON.stringify(source[chapter - 1][stage]);
     ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   })
   .get("/event/:key/:stage", async (ctx) => {
