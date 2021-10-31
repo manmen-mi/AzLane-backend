@@ -35,19 +35,18 @@ router.get("/main/:chapter/:stage", async (ctx) => {
     ctx.response.body = JSON.stringify(source[chapter - 1][stage]);
     ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   })
-  .get("/event/:key/:stage", async (ctx) => {
+  .get("/event/:key", async (ctx) => {
     const params = helpers.getQuery(ctx, { mergeParams: true });
 
     const evKey = params.key;
     const file = await Deno.readTextFile(`./${evKey}.json`);
     const source = JSON.parse(file);
 
-    const stage = +params.stage;
-    if (!stage) {
+    if (!source) {
       ctx.throw(404);
     }
 
-    ctx.response.body = JSON.stringify(source[stage].normal);
+    ctx.response.body = JSON.stringify(source);
     ctx.response.headers.append('Access-Control-Allow-Origin', '*');
   });
 
