@@ -12,7 +12,7 @@ interface Post {
 
 interface Comment {
     depth: number,
-    kansen: string,
+    name: string,
     comment: Article
 }
 
@@ -25,7 +25,7 @@ const basePost: Post = {
 
 const baseComment: Comment = {
     depth: 0,
-    kansen: "",
+    name: "",
     comment: {jp: "", ko: ""}
 }
 
@@ -42,8 +42,8 @@ const ignoreLine = [
 const filtered = source.filter(l => l.length && !ignoreLine.includes(l))
 console.log('filtered > ' + filtered.length);
 
-const postRegex = /\|CENTER:&attachref\(img\/(?<kanji>.+)_icon\.jpg,nolink,50x50\);&br;(?<id>.+)\|&attachref\(.*\.jpg,nolink,70x70\);\|''(?<article>.+) ''\|/;
-const commentRegex = /&attachref\(img\/(?<kanji>.+)_icon.jpg,nolink,50x50\);\|(?<id>.+)\.(?<comment>.+)\|/;
+const postRegex = /\|CENTER:&attachref\(img\/(?<kanji>.+)(_icon|_icon2)?\.jpg,nolink,50x50\);&br;(?<id>.+)\|&attachref\(.*\.jpg,nolink,70x70\);\|''(?<article>.+) ''\|/;
+const commentRegex = /&attachref\(img\/(?<kanji>.+)(_icon|_icon2)?\.jpg,nolink,50x50\);\|(?<id>.+)\.(?<comment>.+)\|/;
 const commanderRegex = /\|~\|指揮官\|>\|(?<comment>.+)\|/;
 
 const foundKanji: Record<string, string> = {};
@@ -79,7 +79,7 @@ filtered.forEach(line => {
 
         const comment = JSON.parse(JSON.stringify(baseComment)) as Comment;
         comment.depth = /\|~\|(~|\s)\|/.test(line) ? 1 : 0;
-        comment.kansen = kanji;
+        comment.name = kanji;
         comment.comment.jp = matched.groups.comment;
 
         currentPost?.comments.push(comment);
@@ -87,7 +87,7 @@ filtered.forEach(line => {
         const matched = commanderRegex.exec(line);
 
         const comment = JSON.parse(JSON.stringify(baseComment)) as Comment;
-        comment.kansen = 'commander';
+        comment.name = 'commander';
         comment.comment.jp = matched?.groups?.comment ?? 'regex_error';
 
         currentPost?.comments.push(comment);
